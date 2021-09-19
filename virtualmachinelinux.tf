@@ -3,23 +3,23 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-vmliux"
-  location = "brazilsouth"
+  name     = "rg-vmlinux-eastus"
+  location =  var.location
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = "vmliux-vnet"
-  address_space       = ["10.0.0.0/16", "192.168.0.0/16"]
+  name                = "vnet-eastus"
+  address_space       = ["192.168.0.0/16"]
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
 }
 
 resource "azurerm_subnet" "subnet" {
-  name                 = "vmliux-subnet"
+  name                 = "subnet-eastus"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = ["10.0.2.0/24"]
+  address_prefixes     = ["192.168.1.0/24"]
 }
 
 resource "azurerm_public_ip" "publicip" {
@@ -114,4 +114,9 @@ resource "azurerm_linux_virtual_machine" "vmlinux" {
     version   = "latest"
 
   }
+}
+
+output "network_interface_private_ip" {
+  description = "private ip addresses of the vm nics"
+  value       = azurerm_network_interface.nic.*.private_ip_address
 }
